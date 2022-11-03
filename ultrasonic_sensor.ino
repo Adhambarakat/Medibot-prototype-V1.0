@@ -1,5 +1,7 @@
 #include <Servo.h>
 Servo servo;
+  int limit = 10;
+
 
 void setup(){
   Serial.begin(9600);
@@ -17,7 +19,7 @@ void setup(){
 
 
 void loop(){
-  front();
+  //ultrasonic sensor
   digitalWrite(5,LOW);
   delayMicroseconds(2);
   digitalWrite(5,HIGH);
@@ -28,48 +30,54 @@ int distance = interval * 0.0343/2;
 Serial.println(interval);
 Serial.println("distance = ");
 Serial.println(distance);
-delay(2000);
 
+//servo and positioning
 int pos = 0;
-for(pos = 0;  pos <= 180;  pos++){
-  servo.write(pos);
-  delay(10);
+servo.write(0);
 
+if(distance>limit){
+  do{
+    front();
+  }while(distance>limit);
+  
+}else if(distance<limit){
+
+  do{
+
+    back();
+    servo.write(90);
+  }while(distance<limit);
 }
-for(pos = 180;  pos >= 0; pos--){
-  servo.write(pos);
-  delay(10);
-  Serial.println(pos);
-
-}
-
-if(pos = 90 && distance <= 5){
-Serial.println("obstacleFront");
-back();
-delay(50);
-right();
-delay(50);
-front();
-}
-
-if(pos <= 90 && distance <= 5){
-  Serial.println("obstacleRight");
-  left();
-  delay(50);
-  front();
-}
-if(pos >= 90 && distance <= 5){
-  Serial.println("obstacleLeft");
-  right();
-  delay(50);
-  front();
-}
-
-
+    if(distance>limit){
+      do{
+        left();
+        delay(2000);
+        front();
+      }while(distance>limit);
+    }else if(distance<limit){
+      do{
+        servo.write(180);
+      }while(distance<limit);
+    }
+        if(distance>limit){
+          do{
+            right();
+            delay(2000);
+            front();
+          }while(distance>limit);
+        }else if(distance<limit){
+          do{
+            back();
+            delay(4000);
+            right();
+            delay(2000);
+            front();
+          }while(distance<limit);
+        }
 
   
-
 }
+
 
 void front(){
   digitalWrite(3, HIGH);

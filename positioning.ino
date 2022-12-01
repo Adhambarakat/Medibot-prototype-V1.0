@@ -1,64 +1,77 @@
-#include <heartRate.h>
-#include <MAX30105.h>
-#include <spo2_algorithm.h>
-#include <Wire.h>
-MAX30105 sensor;
-int beats[10];
-float beat = 0;
-int avgbpm = 0;
-int i = 0;
-int arrayindex =0; 
-int x =0;
-int val; //value recieved from the pi
-#define front_right 3;
-#define back_right 6;
-#define front_left 9;
-#define back_left 10;
+void front(){
+  digitalWrite(5,HIGH);
+  digitalWrite(6,LOW);
+  digitalWrite(9,HIGH);
+  digitalWrite(10,LOW);
+}
+
+
+void back(){
+  digitalWrite(5,LOW);
+  digitalWrite(6,HIGH);
+  digitalWrite(9,LOW);
+  digitalWrite(10,HIGH);
+}
+
+void Stop(){
+  digitalWrite(5,LOW);
+  digitalWrite(6,LOW);
+  digitalWrite(9,LOW);
+  digitalWrite(10,LOW);
+}
+
+void right(){
+  digitalWrite(5,LOW);
+  digitalWrite(6,HIGH);
+  digitalWrite(9,HIGH);
+  digitalWrite(10,LOW);
+}
+
+void left(){
+  digitalWrite(5,HIGH);
+  digitalWrite(6,LOW);
+  digitalWrite(9,LOW);
+  digitalWrite(10,HIGH);
+}
+
 
 void setup() {
   Serial.begin(9600);
-  Serial.begin(115200);
-  sensor.begin(Wire , I2C_SPEED_FAST);
-  sensor.setup();
-  sensor.enableDIETEMPRDY();
+pinMode(3,INPUT);
+pinMode(4,OUTPUT);
+pinMode(5,OUTPUT);
+pinMode(6,OUTPUT);
+pinMode(9,OUTPUT);
+pinMode(10,OUTPUT);
 }
 
 void loop() {
-   digitalWrite(5,LOW);
+  digitalWrite(4,LOW);
+  delayMicroseconds(12);
+  digitalWrite(4,HIGH);
   delayMicroseconds(2);
-  digitalWrite(5,HIGH);
-  delayMicroseconds(10);
-  int interval = pulseIn(4,HIGH);
-
-int distance = interval * 0.0343/2;
-Serial.println(interval);
-Serial.println("distance = ");
-Serial.println(distance);
-delay(2000);
-
-int val = Serial.read();  
-
-if(val = 1){
- digitalWrite(3, HIGH);
- digitalWrite(6, LOW);
- digitalWrite(9, LOW);
- digitalWrite(10, HIGH);
- delay(); // not measured yet
-
-}
-else if(val = 2){
-     digitalWrite(3, LOW);
-     digitalWrite(6, HIGH);
-     digitalWrite(9, HIGH);
-     digitalWrite(10, LOW);
-     delay(); //not measured yet
-     digitalWrite(3,HIGH);
-     digitalWrite(6,LOW);
-     digitalWrite(9,HIGH);
-     digitalWrite(10,LOW);
-     
+  double t = pulseIn(3,HIGH);
+  long dist = t*0.0294/2;
 
 
+
+  if (Serial.read() == 1){
+    right();
+    delay(10000);
+    Serial.println("right");
+    }
+    
+    else if(Serial.read() == 2){
+      left();
+      delay(2000);
+      if(dist > 10){
+        front();
+      }else{Stop();}
+    }
+  
+
+  
 }
 
-}
+
+
